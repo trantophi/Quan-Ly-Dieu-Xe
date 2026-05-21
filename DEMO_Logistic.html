@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0B1628">
+<title>Công Ty Demo Logistic — Hệ Thống Điều Xe V11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:#F0F4F8;font-family:'Be Vietnam Pro',sans-serif;font-size:14px;color:#1E293B;-webkit-overflow-scrolling:touch}
+
+:root{
+  --red:#DC2626;--navy:#0B1628;--blue:#1D4ED8;--blue2:#1E40AF;
+  --green:#059669;--amber:#D97706;--purple:#7C3AED;
+  --card:#fff;--border:#E2E8F0;--muted:#64748B;
+}
+
+/* Loader */
+#loader{position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:9999;display:none;justify-content:center;align-items:center;flex-direction:column}
+.spin{width:38px;height:38px;border:3px solid #E2E8F0;border-top-color:var(--red);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Card */
+.card-biz{background:var(--card);border-radius:12px;padding:16px;border:1px solid var(--border);margin-bottom:14px}
+
+/* Topbar */
+#topbar{background:var(--navy);border-radius:12px;padding:11px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+#topbar .nm{color:#fff;font-weight:800;text-transform:uppercase;font-size:14px;letter-spacing:.3px}
+.rbadge{background:var(--red);color:#fff;font-size:10px;padding:2px 9px;border-radius:20px;font-weight:700;margin-top:3px;display:inline-block}
+
+/* Buttons */
+.btn-red,.btn-blue,.btn-green,.btn-amber,.btn-purple{color:#fff;border:none;font-weight:700;border-radius:7px;min-height:42px;cursor:pointer;font-family:inherit;font-size:13px;transition:opacity .15s}
+.btn-red{background:var(--red)}.btn-red:active{opacity:.85}
+.btn-blue{background:var(--blue)}.btn-blue:active{opacity:.85}
+.btn-green{background:var(--green)}.btn-green:active{opacity:.85}
+.btn-amber{background:var(--amber)}.btn-amber:active{opacity:.85}
+.btn-purple{background:var(--purple)}.btn-purple:active{opacity:.85}
+@media(hover:hover){
+  .btn-red:hover{background:#B91C1C}.btn-blue:hover{background:var(--blue2)}
+  .btn-green:hover{background:#047857}.btn-amber:hover{background:#B45309}
+  .btn-purple:hover{background:#6D28D9}
+}
+
+/* Nav */
+.nav-pills .nav-link{font-weight:700;border-radius:8px;font-size:12px;color:var(--muted);padding:8px 12px;font-family:inherit}
+.nav-pills .nav-link.active{background:var(--blue);color:#fff}
+
+/* Form */
+.form-control,.form-select{border-radius:7px;padding:9px 12px;font-size:13px;border:1px solid var(--border);font-family:inherit}
+.form-control:focus,.form-select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(29,78,216,.12);outline:none}
+.form-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+
+/* Pills */
+.pill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block}
+.pill-red{background:#FEE2E2;color:#991B1B}
+.pill-green{background:#D1FAE5;color:#065F46}
+.pill-amber{background:#FEF3C7;color:#92400E}
+.pill-blue{background:#DBEAFE;color:#1E3A8A}
+.pill-purple{background:#EDE9FE;color:#5B21B6}
+.pill-gray{background:#F1F5F9;color:#475569}
+
+/* Trip card */
+.trip-card{background:#fff;border-radius:10px;border:1px solid var(--border);padding:14px;margin-bottom:11px;transition:border-color .15s}
+.trip-card:hover{border-color:var(--blue)}
+
+/* Table */
+.table{font-size:12px}.table thead th{background:#F8FAFC;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.4px;vertical-align:middle;white-space:nowrap}
+.table td{vertical-align:middle;padding:8px 10px}
+.table-responsive{-webkit-overflow-scrolling:touch;overflow-x:auto}
+
+/* Live dot */
+.dot-live{width:7px;height:7px;background:var(--green);border-radius:50%;display:inline-block}
+@media(prefers-reduced-motion:no-preference){.dot-live{animation:pulse 1.8s infinite}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* Notif */
+#notifBar{background:linear-gradient(90deg,var(--red),#B91C1C);color:#fff;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;margin-bottom:12px;display:none}
+
+/* Login */
+#loginView{background:linear-gradient(135deg,#0B1628 0%,#1E3A5F 50%,#0B1628 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:#fff;border-radius:16px;padding:36px 32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.login-logo{width:54px;height:54px;background:var(--red);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;color:#fff}
+
+/* Stat cards */
+.stat-card{background:var(--card);border-radius:10px;border:1px solid var(--border);padding:14px 16px}
+.stat-val{font-size:22px;font-weight:800;color:var(--navy);margin:4px 0 2px;letter-spacing:-.5px}
+.stat-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.stat-sub{font-size:11px;color:var(--muted)}
+
+/* Report table */
+.rpt-tbl{font-size:12px;width:100%;border-collapse:collapse}
+.rpt-tbl th{background:#F8FAFC;padding:8px 10px;font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--border)}
+.rpt-tbl td{padding:8px 10px;border-bottom:1px solid #F1F5F9}
+.rpt-tbl tr:last-child td{border-bottom:none}
+.rpt-tbl tfoot td{font-weight:700;background:#F8FAFC;border-top:2px solid var(--border)}
+
+/* Debt row colors */
+.row-warn{background:#FFFBEB}.row-danger{background:#FFF5F5}
+
+.hidden{display:none!important}
+@media(max-width:576px){#topbar{flex-direction:column;gap:8px;text-align:center}.card-biz{padding:12px}}
+@media(max-width:360px){body{font-size:13px}.nav-pills .nav-link{font-size:10px;padding:6px 8px}}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="spin"></div><div style="margin-top:12px;font-weight:700;color:var(--navy);font-size:13px">ĐANG XỬ LÝ...</div></div>
+
+<!-- LOGIN -->
+<div id="loginView">
+  <div class="login-card">
+    <div class="login-logo">🚛</div>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-weight:800;font-size:16px;color:var(--navy);text-transform:uppercase;letter-spacing:.5px">CÔNG TY DEMO LOGISTIC</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Hệ Thống Quản Lý Điều Xe V11</div>
+      <div style="margin-top:10px;padding:8px 12px;background:#EFF6FF;border-radius:8px;font-size:11px;color:var(--blue2)">
+        💡 <b>Demo:</b> Chọn tài khoản bên dưới để trải nghiệm
+      </div>
+    </div>
+    <!-- Quick login buttons -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">
+      <button onclick="quickLogin('ADM001','Admin')" style="padding:10px;border:1.5px solid var(--blue);border-radius:8px;background:#EFF6FF;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--blue2)">
+        🛡️ Admin
+      </button>
+      <button onclick="quickLogin('DX001','Điều xe')" style="padding:10px;border:1.5px solid var(--red);border-radius:8px;background:#FEF2F2;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--red)">
+        📋 Điều Xe
+      </button>
+      <button onclick="quickLogin('TX001','Tài xế')" style="padding:10px;border:1.5px solid var(--green);border-radius:8px;background:#F0FDF4;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--green)">
+        🚛 Tài Xế
+      </button>
+      <button onclick="quickLogin('KT001','Kế toán')" style="padding:10px;border:1.5px solid var(--purple);border-radius:8px;background:#F5F3FF;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;color:var(--purple)">
+        📊 Kế Toán
+      </button>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:16px;text-align:center;font-size:11px;color:var(--muted)">Hoặc đăng nhập thủ công</div>
+    <input type="text" id="u" class="form-control mb-2" placeholder="Mã đăng nhập (VD: ADM001)">
+    <div style="position:relative;margin-bottom:12px">
+      <input type="password" id="p" class="form-control" placeholder="Mật khẩu" onkeydown="if(event.key==='Enter')handleLogin()" style="padding-right:42px">
+      <button onclick="togglePwd()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted)"><span id="eye">👁</span></button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <label style="cursor:pointer;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)">
+        <input type="checkbox" id="rem" style="width:14px;height:14px">Ghi nhớ
+      </label>
+      <span style="font-size:12px;color:var(--blue2);font-weight:600;cursor:pointer" onclick="forgotPwd()">Quên mật khẩu?</span>
+    </div>
+    <button onclick="handleLogin()" class="btn-red w-100 py-2" style="border-radius:8px;font-size:14px">ĐĂNG NHẬP</button>
+    <div style="margin-top:16px;padding:10px;background:#F8FAFC;border-radius:8px;font-size:10px;color:var(--muted);text-align:center">
+      ⚠️ Đây là bản demo. Dữ liệu không lưu vào Google Sheet thật.
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainView" class="container-fluid py-3 px-3 hidden" style="max-width:1100px">
+  <div id="topbar">
+    <div>
+      <div class="nm" id="uName">...</div>
+      <span class="rbadge" id="uRole">...</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="clkTime" style="color:#94A3B8;font-size:11px;font-weight:600"></span>
+      <button onclick="doLogout()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">
+        <i class="bi bi-box-arrow-right me-1"></i>THOÁT
+      </button>
+    </div>
+  </div>
+  <div id="notifBar"></div>
+  <ul class="nav nav-pills nav-fill mb-3 bg-white p-2 rounded" style="border:1px solid var(--border)" id="navTabs">
+    <li class="nav-item"><a class="nav-link active" onclick="switchTab('work',this)"><i class="bi bi-briefcase-fill me-1"></i>TÁC NGHIỆP</a></li>
+    <li class="nav-item"><a class="nav-link" onclick="switchTab('history',this)"><i class="bi bi-clock-history me-1"></i>LỊCH SỬ</a></li>
+    <li class="nav-item hidden" id="tabReport"><a class="nav-link" onclick="switchTab('report',this)"><i class="bi bi-bar-chart-line-fill me-1"></i>LÃI LỖ</a></li>
+    <li class="nav-item hidden" id="tabDebt"><a class="nav-link" onclick="switchTab('debt',this)"><i class="bi bi-currency-dollar me-1"></i>CÔNG NỢ</a></li>
+  </ul>
+  <div id="content"></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   MOCK DATA — mô phỏng dữ liệu thực tế
+════════════════════════════════════════════ */
+const USERS = {
+  'ADM001': {ma:'ADM001',ten:'Nguyễn Quản Trị',role:'Admin',pass:'Admin@2026'},
+  'DX001' : {ma:'DX001', ten:'Trần Điều Xe',   role:'Điều xe',pass:'DX@2026'},
+  'KT001' : {ma:'KT001', ten:'Lê Kế Toán',     role:'Kế toán',pass:'KT@2026'},
+  'GD001' : {ma:'GD001', ten:'Phạm Giám Đốc',  role:'Giám đốc',pass:'GD@2026'},
+  'TX001' : {ma:'TX001', ten:'Nguyễn Văn An',   role:'Tài xế',pass:'TX@2026'},
+  'TX002' : {ma:'TX002', ten:'Trần Văn Bình',   role:'Tài xế',pass:'TX@2026'},
+};
+
+const VEHICLES = [
+  {ma:'60C-478.81',loai:'Xe tải',tai:10},
+  {ma:'60H-080.44',loai:'Xe tải',tai:10},
+  {ma:'60H-239.70',loai:'Xe tải',tai:5},
+  {ma:'60H-239.74',loai:'Xe tải',tai:5},
+  {ma:'60H-312.32',loai:'Xe tải',tai:10},
+  {ma:'60H-312.87',loai:'Xe tải',tai:10},
+  {ma:'66H-009.21',loai:'Xe tải',tai:10},
+];
+
+const DRIVERS = [
+  {ma:'TX001',ten:'Nguyễn Văn An',email:'an@demo.com'},
+  {ma:'TX002',ten:'Trần Văn Bình',email:'binh@demo.com'},
+];
+
+const CUSTOMERS = [
+  {ma:'KH001',ten:'Taiji Co., Ltd',hh:0.0866},
+  {ma:'KH002',ten:'Công ty AK',hh:0},
+  {ma:'KH003',ten:'Ngô Han',hh:0},
+  {ma:'KH004',ten:'Inox Tương Lai',hh:0},
+  {ma:'KH005',ten:'Xốp Sâm Hưng',hh:0},
+];
+
+const DM_CHI_PHI = [
+  {ma:'CP001',ten:'Sửa Xe'},
+  {ma:'CP002',ten:'Dầu DO'},
+  {ma:'CP003',ten:'Đăng Kiểm'},
+  {ma:'CP004',ten:'Tiền Ăn'},
+  {ma:'CP005',ten:'Tiền Vé'},
+  {ma:'CP006',ten:'Phí Không Dừng'},
+  {ma:'CP007',ten:'Khác'},
+];
+
+// Chuyến xe mock
+let TRIPS = [
+  {row:3,id:'CX260101-12',ngayDi:'01/01/2026',ngayVe:'03/01/2026',bienSo:'60H-080.44',maTX:'TX001',tenTX:'Nguyễn Văn An',dienGiai:'Hyosung → 417 Thùng',maKH:'KH001',tenKH:'Taiji Co., Ltd',giaTT:1847519,giaHD:2000000,pctHH:0.0866,dtThuc:1687500,tongCP:471000,laiGop:1216500,kmDau:125000,kmCuoi:125500,gioCoMat:'07:00',diemTapKet:'Bãi xe công ty',trangThaiTBao:'Đã gửi'},
+  {row:4,id:'CX260102-34',ngayDi:'02/01/2026',ngayVe:'02/01/2026',bienSo:'60H-239.70',maTX:'TX002',tenTX:'Trần Văn Bình',dienGiai:'AK Biên Hòa → Long An',maKH:'KH002',tenKH:'Công ty AK',giaTT:2200000,giaHD:2400000,pctHH:0,dtThuc:2200000,tongCP:402000,laiGop:1798000,kmDau:98500,kmCuoi:99200,gioCoMat:'06:00',diemTapKet:'Bãi xe công ty',trangThaiTBao:'Đã gửi'},
+  {row:5,id:'CX260105-77',ngayDi:'05/01/2026',ngayVe:'',bienSo:'60H-312.87',maTX:'TX001',tenTX:'Nguyễn Văn An',dienGiai:'Inox Tương Lai → TP.HCM',maKH:'KH004',tenKH:'Inox Tương Lai',giaTT:1500000,giaHD:1600000,pctHH:0,dtThuc:1500000,tongCP:210000,laiGop:1290000,kmDau:132000,kmCuoi:'',gioCoMat:'08:00',diemTapKet:'Bãi xe công ty',trangThaiTBao:'Đã gửi'},
+  {row:6,id:'CX260107-55',ngayDi:'07/01/2026',ngayVe:'',bienSo:'66H-009.21',maTX:'TX002',tenTX:'Trần Văn Bình',dienGiai:'Xốp Sâm Hưng → Bình Dương',maKH:'KH005',tenKH:'Xốp Sâm Hưng',giaTT:3100000,giaHD:3400000,pctHH:0,dtThuc:3100000,tongCP:803000,laiGop:2297000,kmDau:145200,kmCuoi:'',gioCoMat:'07:30',diemTapKet:'Bãi xe công ty',trangThaiTBao:'Đang xử lý...'},
+];
+
+let CONG_NO = [
+  {row:3,maCN:'CN001',maChuyen:'CX260101-12',ngay:'01/01/2026',loaiNo:'Khách hàng nợ',doiTuong:'Taiji Co., Ltd',maDoiTuong:'KH001',tongPT:1687500,daThu:843750,conNo:843750,hanThu:'10/01/2026',ngayClear:''},
+  {row:4,maCN:'CN002',maChuyen:'CX260102-34',ngay:'02/01/2026',loaiNo:'Khách hàng nợ',doiTuong:'Công ty AK',maDoiTuong:'KH002',tongPT:2200000,daThu:2200000,conNo:0,hanThu:'09/01/2026',ngayClear:'02/01/2026'},
+  {row:5,maCN:'TX001A',maChuyen:'CX260105-77',ngay:'05/01/2026',loaiNo:'Tài xế nợ quỹ',doiTuong:'Nguyễn Văn An',maDoiTuong:'TX001',tongPT:1500000,daThu:0,conNo:1500000,hanThu:'07/01/2026',ngayClear:''},
+];
+
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let user = {}, appData = {};
+let tripCounter = 8;
+
+/* ════════════════════════════════════════════
+   FORMAT HELPERS
+════════════════════════════════════════════ */
+function fmtVND(n){if(!n&&n!==0)return'—';return Number(n).toLocaleString('vi-VN')+' ₫'}
+function fmtKM(n){if(!n&&n!==0)return'—';return Number(n).toLocaleString('vi-VN')+' km'}
+function fmtNum(n){if(!n&&n!==0)return'—';return Number(n).toLocaleString('vi-VN')}
+function toggleLoader(s){document.getElementById('loader').style.display=s?'flex':'none'}
+function togglePwd(){const p=document.getElementById('p'),e=document.getElementById('eye');p.type=p.type==='password'?'text':'password';e.textContent=p.type==='password'?'👁':'🙈'}
+
+/* ════════════════════════════════════════════
+   CLOCK
+════════════════════════════════════════════ */
+function startClock(){
+  setInterval(()=>{
+    const now=new Date();
+    const el=document.getElementById('clkTime');
+    if(el)el.textContent=now.toLocaleString('vi-VN',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  },1000);
+}
+
+/* ════════════════════════════════════════════
+   AUTH
+════════════════════════════════════════════ */
+function quickLogin(ma, role){
+  const u=USERS[ma];
+  if(!u)return;
+  document.getElementById('u').value=ma;
+  document.getElementById('p').value=u.pass;
+  setTimeout(handleLogin,100);
+}
+
+function handleLogin(){
+  const u=document.getElementById('u').value.trim();
+  const p=document.getElementById('p').value.trim();
+  if(!u||!p)return Swal.fire('Thiếu thông tin','Nhập đầy đủ tài khoản và mật khẩu.','warning');
+  toggleLoader(true);
+  setTimeout(()=>{
+    toggleLoader(false);
+    const found=Object.values(USERS).find(x=>x.ma.toLowerCase()===u.toLowerCase()&&x.pass===p);
+    if(found){
+      if(document.getElementById('rem').checked){localStorage.setItem('demo_u',u);localStorage.setItem('demo_p',p);}
+      else{localStorage.removeItem('demo_u');localStorage.removeItem('demo_p');}
+      user=found;
+      setupApp();
+    }else{
+      Swal.fire({icon:'error',title:'Đăng nhập thất bại',text:'Sai tài khoản hoặc mật khẩu.',confirmButtonColor:'#DC2626'});
+    }
+  },600);
+}
+
+function forgotPwd(){Swal.fire('Thông báo','Trong bản demo, mật khẩu = tên role + @2026\nVD: Admin@2026, DX@2026, TX@2026','info')}
+function doLogout(){location.reload()}
+
+window.onload=()=>{
+  const su=localStorage.getItem('demo_u'),sp=localStorage.getItem('demo_p');
+  if(su){document.getElementById('u').value=su;document.getElementById('rem').checked=true;}
+  if(sp)document.getElementById('p').value=sp;
+};
+
+/* ════════════════════════════════════════════
+   SETUP APP
+════════════════════════════════════════════ */
+function setupApp(){
+  document.getElementById('loginView').classList.add('hidden');
+  document.getElementById('mainView').classList.remove('hidden');
+  document.getElementById('uName').textContent=user.ten;
+  document.getElementById('uRole').textContent=user.role;
+
+  // Build appData
+  appData={
+    activeTrips : TRIPS.filter(t=>!t.ngayVe&&t.maTX===user.ma||(!t.ngayVe&&user.role!=='Tài xế')).filter(t=>user.role==='Tài xế'?t.maTX===user.ma:true).filter(t=>!t.ngayVe),
+    historyTrips: TRIPS.filter(t=>t.ngayVe&&(user.role==='Tài xế'?t.maTX===user.ma:true)),
+    vehicles    : VEHICLES,
+    drivers     : DRIVERS,
+    customers   : CUSTOMERS,
+    routes      : CUSTOMERS.map(c=>({ma:c.ma,ten:c.ten})),
+    danhMucChiPhi: DM_CHI_PHI,
+    myDebts     : CONG_NO.filter(d=>d.loaiNo==='Tài xế nợ quỹ'&&d.maDoiTuong===user.ma&&d.conNo>0),
+  };
+
+  if(['Admin','Kế toán','Giám đốc'].includes(user.role)){
+    document.getElementById('tabReport').classList.remove('hidden');
+    document.getElementById('tabDebt').classList.remove('hidden');
+  }
+
+  // Notif bar
+  const active=TRIPS.filter(t=>!t.ngayVe).length;
+  if(active>0){
+    const nb=document.getElementById('notifBar');
+    nb.style.display='block';
+    nb.innerHTML=`<i class="bi bi-broadcast me-2"></i><b>${active} xe</b> đang trên đường hôm nay.`;
+  }
+
+  startClock();
+  renderWork();
+}
+
+/* ════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════ */
+function switchTab(t,el){
+  document.querySelectorAll('#navTabs .nav-link').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  if(t==='work')renderWork();
+  else if(t==='history')renderHistory();
+  else if(t==='report')renderReport();
+  else if(t==='debt')renderDebt();
+}
+
+/* ════════════════════════════════════════════
+   TÁC NGHIỆP
+════════════════════════════════════════════ */
+function renderWork(){
+  let h='';
+  const active=TRIPS.filter(t=>!t.ngayVe&&(user.role==='Tài xế'?t.maTX===user.ma:true));
+
+  /* TÀI XẾ */
+  if(user.role==='Tài xế'){
+    h+=`<div class="card-biz" style="border-top:4px solid var(--blue)">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0"><i class="bi bi-geo-alt-fill text-primary me-2"></i>CHUYẾN ĐANG CHẠY</h5>
+        <span class="badge bg-primary rounded-pill">${active.length}</span>
+      </div>`;
+    if(!active.length){
+      h+=`<div class="text-center py-4 text-muted"><i class="bi bi-cup-hot fs-1 d-block mb-2"></i>Không có chuyến đang chạy.</div>`;
+    } else {
+      active.forEach(t=>{
+        h+=`<div class="trip-card">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="pill pill-blue">#${t.id}</span>
+            <span class="text-muted" style="font-size:11px">${t.ngayDi}</span>
+          </div>
+          <div class="mb-1">🚛 Xe: <b>${t.bienSo}</b> &nbsp;|&nbsp; 🏢 ${t.tenKH}</div>
+          <div class="mb-1">🗺️ ${t.dienGiai||'—'}</div>
+          <div class="mb-1">⏰ Giờ có mặt: <b class="text-danger">${t.gioCoMat||'—'}</b></div>
+          ${t.dtThuc>0?`<div class="mb-3">💰 DT Thực: <b class="text-success">${fmtVND(t.dtThuc)}</b>${t.pctHH>0?' (sau HH '+(t.pctHH*100).toFixed(1)+'%)':''}</div>`:'<div class="mb-3"></div>'}
+          <div class="row g-2">
+            <div class="col-6"><button onclick="openExpense('${t.id}')" class="btn btn-amber w-100 py-2"><i class="bi bi-receipt me-1"></i>KHAI PHÍ</button></div>
+            <div class="col-6"><button onclick="openCashModal('${t.id}','${t.tenTX}')" class="btn btn-blue w-100 py-2"><i class="bi bi-cash me-1"></i>BÁO THU</button></div>
+            <div class="col-12"><button onclick="finishTrip('${t.id}',${t.row})" class="btn btn-green w-100 py-2"><i class="bi bi-check-circle me-1"></i>KẾT THÚC CHUYẾN</button></div>
+          </div>
+        </div>`;
+      });
+    }
+    h+=`</div>`;
+    // Nợ quỹ
+    if(appData.myDebts&&appData.myDebts.length>0){
+      h+=`<div class="card-biz" style="border-top:4px solid var(--red)">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold m-0 text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i>NỢ QUỸ CẦN NỘP</h5>
+          <span class="badge bg-danger rounded-pill">${appData.myDebts.length}</span>
+        </div>`;
+      appData.myDebts.forEach(d=>{
+        h+=`<div class="trip-card" style="border-color:#FCA5A5">
+          <div class="d-flex justify-content-between mb-2"><span class="pill pill-red">${d.maCN}</span><span class="text-muted" style="font-size:11px">${d.ngay}</span></div>
+          <div class="mb-1">Chuyến: <b>${d.maChuyen}</b></div>
+          <div class="mb-3"><span class="pill pill-red">Còn nợ: <b>${fmtVND(d.conNo)}</b></span></div>
+          <button onclick="openPayFund('${d.maCN}',${d.conNo})" class="btn btn-blue w-100 py-2"><i class="bi bi-cash-coin me-1"></i>NỘP TIỀN VỀ QUỸ</button>
+        </div>`;
+      });
+      h+=`</div>`;
+    }
+  }
+
+  /* QUẢN LÝ */
+  else {
+    const canCreate=['Admin','Điều xe','Kế toán'].includes(user.role);
+    const canCancel=['Admin','Điều xe'].includes(user.role);
+
+    // Form tạo chuyến
+    if(canCreate){
+      const hOpts=Array.from({length:24},(_,i)=>`<option value="${String(i).padStart(2,'0')}" ${i===7?'selected':''}>${String(i).padStart(2,'0')}</option>`).join('');
+      const mOpts=['00','05','10','15','20','25','30','35','40','45','50','55'].map(m=>`<option>${m}</option>`).join('');
+      h+=`<div class="card-biz mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold m-0 text-primary"><i class="bi bi-plus-circle-fill me-2"></i>LÊN CHUYẾN XE MỚI</h5>
+        </div>
+        <form onsubmit="event.preventDefault();submitTrip();" class="row g-2">
+          <div class="col-6 col-md-2"><label class="form-label">Ngày đi *</label><input type="date" id="f_ngay" class="form-control" required></div>
+          <div class="col-6 col-md-2"><label class="form-label">Giờ CM *</label>
+            <div class="d-flex gap-1 align-items-center">
+              <select id="f_gio_h" class="form-select text-center fw-bold" style="max-width:68px">${hOpts}</select>
+              <span class="fw-bold text-muted">:</span>
+              <select id="f_gio_m" class="form-select text-center fw-bold" style="max-width:68px">${mOpts}</select>
+            </div>
+          </div>
+          <div class="col-6 col-md-2"><label class="form-label">Biển Số *</label>
+            <select id="f_xe" class="form-select" required>
+              <option value="">-- Chọn xe --</option>
+              ${VEHICLES.map(v=>`<option value="${v.ma}">${v.ma} (${v.loai})</option>`).join('')}
+            </select>
+          </div>
+          <div class="col-6 col-md-3"><label class="form-label">Tài Xế *</label>
+            <select id="f_tx" class="form-select" required>
+              <option value="">-- Chọn tài xế --</option>
+              ${DRIVERS.map(d=>`<option value="${d.ma}">${d.ten}</option>`).join('')}
+            </select>
+          </div>
+          <div class="col-6 col-md-3"><label class="form-label">KM Đồng hồ *</label><input type="number" id="f_km" class="form-control" placeholder="VD: 125000" required></div>
+          <div class="col-6 col-md-3"><label class="form-label">Khách Hàng *</label>
+            <select id="f_kh" class="form-select" required onchange="autoFillHH()">
+              <option value="">-- Chọn KH --</option>
+              ${CUSTOMERS.map(c=>`<option value="${c.ma}" data-hh="${c.hh||0}">${c.ten}</option>`).join('')}
+            </select>
+          </div>
+          <div class="col-12 col-md-5"><label class="form-label">Diễn giải / Tuyến *</label><input type="text" id="f_dien" class="form-control" required placeholder="VD: Hyosung-417Thùng / Biên Hòa → TP.HCM..."></div>
+          <div class="col-6 col-md-2"><label class="form-label">% Hoa hồng</label>
+            <div class="input-group"><input type="number" id="f_hh" class="form-control text-center" step="0.01" min="0" max="100" placeholder="0" oninput="calcDT()"><span class="input-group-text">%</span></div>
+          </div>
+          <div class="col-6 col-md-2 d-flex align-items-end">
+            <div class="w-100 p-2 rounded text-center" style="background:#F0FDF4;border:1px solid #86EFAC"><div style="font-size:10px;color:var(--muted);font-weight:700">DT THỰC</div><div id="f_dt" style="font-size:13px;font-weight:700;color:var(--green)">—</div></div>
+          </div>
+          <div class="col-6 col-md-3"><label class="form-label">Giá Thực Tế (₫)</label><input type="number" id="f_gia_tt" class="form-control" placeholder="VD: 1847519" oninput="calcDT()"></div>
+          <div class="col-6 col-md-3"><label class="form-label">Giá Xuất HĐ (₫)</label><input type="number" id="f_gia_hd" class="form-control" placeholder="VD: 2000000"></div>
+          <div class="col-12">
+            <div class="p-2 rounded" style="background:#FFFBEB;border:1px solid #FCD34D">
+              <div style="font-size:10px;font-weight:700;color:#92400E;margin-bottom:8px">💰 CHI PHÍ TRỰC TIẾP (tùy chọn)</div>
+              <div class="row g-2">
+                <div class="col-4 col-md-2"><label class="form-label">Dầu DO</label><input type="number" id="f_dau" class="form-control" placeholder="0"></div>
+                <div class="col-4 col-md-2"><label class="form-label">Tiền Ăn</label><input type="number" id="f_an" class="form-control" placeholder="0"></div>
+                <div class="col-4 col-md-2"><label class="form-label">Tiền Vé</label><input type="number" id="f_ve" class="form-control" placeholder="0"></div>
+                <div class="col-4 col-md-2"><label class="form-label">Phí KD</label><input type="number" id="f_kd" class="form-control" placeholder="0"></div>
+                <div class="col-4 col-md-2"><label class="form-label">Sửa xe</label><input type="number" id="f_sua" class="form-control" placeholder="0"></div>
+                <div class="col-4 col-md-2"><label class="form-label">Khác</label><input type="number" id="f_khac" class="form-control" placeholder="0"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 text-end mt-1"><button type="submit" class="btn btn-red px-4 py-2"><i class="bi bi-send-check me-2"></i>PHÁT LỆNH ĐIỀU XE</button></div>
+        </form>
+      </div>`;
+    }
+
+    // Form thu tiền nhanh
+    if(['Admin','Kế toán','Điều xe'].includes(user.role)){
+      h+=`<div class="card-biz mb-3" style="border-top:4px solid var(--purple)">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold m-0" style="color:var(--purple)"><i class="bi bi-currency-dollar me-2"></i>GHI NHẬN THU TIỀN</h5>
+        </div>
+        <div class="row g-2">
+          <div class="col-md-3 col-6"><label class="form-label">Mã Công Nợ *</label><input type="text" id="pay_cn" class="form-control" placeholder="VD: CN001"></div>
+          <div class="col-md-3 col-6"><label class="form-label">Số Tiền (₫) *</label>
+            <input type="number" id="pay_st" class="form-control" placeholder="VD: 843.750" min="0" step="1000" oninput="const el=document.getElementById('pay_prev');if(el)el.textContent=this.value>0?'→ '+fmtVND(this.value):''">
+            <div id="pay_prev" style="font-size:11px;color:var(--purple);font-weight:700;margin-top:3px"></div>
+          </div>
+          <div class="col-md-3 col-6"><label class="form-label">Hình Thức</label>
+            <select id="pay_ht" class="form-select">
+              <option value="CK - Khách hàng">CK - Khách hàng</option>
+              <option value="TM - Tài xế nộp quỹ">TM - Tài xế nộp quỹ</option>
+              <option value="CK - Tài xế nộp">CK - Tài xế nộp</option>
+            </select>
+          </div>
+          <div class="col-md-3 col-6"><label class="form-label">Nội Dung</label><input type="text" id="pay_nd" class="form-control" placeholder="Nội dung CK..."></div>
+          <div class="col-12 text-end"><button onclick="submitPayment()" class="btn btn-purple px-4 py-2"><i class="bi bi-check2-circle me-1"></i>XÁC NHẬN ĐÃ THU</button></div>
+        </div>
+      </div>`;
+    }
+
+    // Bảng xe đang chạy
+    h+=`<div class="card-biz" style="border-top:4px solid var(--green)">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0 text-success"><span class="dot-live me-2"></span>XE ĐANG TRÊN ĐƯỜNG</h5>
+        <span class="badge bg-success rounded-pill">${active.length}</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead><tr>
+            <th>Mã Chuyến</th><th>Ngày Đi</th><th>Biển Số</th>
+            <th>Tài Xế</th><th>Khách / Diễn Giải</th>
+            <th class="text-end">Giá TT</th><th class="text-end">DT Thực</th>
+            <th>Giờ CM</th><th>TBao</th>
+            ${canCancel||['Admin','Kế toán','Điều xe'].includes(user.role)?'<th>Thao Tác</th>':''}
+          </tr></thead><tbody>`;
+    if(!active.length){
+      h+=`<tr><td colspan="10" class="text-center text-muted py-4"><i class="bi bi-cup-hot me-2"></i>Không có xe nào đang chạy.</td></tr>`;
+    } else {
+      active.forEach(t=>{
+        const tc=t.trangThaiTBao==='Đã gửi'?'pill-green':t.trangThaiTBao.startsWith('Lỗi')?'pill-red':'pill-amber';
+        h+=`<tr>
+          <td><span class="badge bg-dark" style="font-size:10px">${t.id}</span></td>
+          <td class="fw-bold">${t.ngayDi}</td>
+          <td class="fw-bold text-primary">${t.bienSo}</td>
+          <td>${t.tenTX}</td>
+          <td><small class="text-muted">${t.tenKH}</small><br><small>${t.dienGiai||''}</small></td>
+          <td class="text-end" style="font-size:12px">${fmtVND(t.giaTT)}</td>
+          <td class="text-end fw-bold text-success" style="font-size:12px">${fmtVND(t.dtThuc)}</td>
+          <td class="fw-bold text-danger">${t.gioCoMat||'—'}</td>
+          <td><span class="pill ${tc}">${t.trangThaiTBao||'—'}</span></td>
+          ${canCancel||['Admin','Kế toán','Điều xe'].includes(user.role)?`<td>
+            <div class="d-flex gap-1">
+              <button onclick="doExportInvoice(${t.row},'${t.id}')" class="btn btn-green btn-sm py-1 px-2" style="font-size:11px;min-height:32px" title="Xuất HĐ"><i class="bi bi-receipt me-1"></i>HĐ</button>
+              ${canCancel?`<button onclick="doCancel(${t.row},'${t.id}')" class="btn btn-red btn-sm py-1 px-2" style="font-size:11px;min-height:32px"><i class="bi bi-x-circle"></i></button>`:''}
+            </div>
+          </td>`:''}
+        </tr>`;
+      });
+    }
+    h+=`</tbody></table></div></div>`;
+  }
+
+  document.getElementById('content').innerHTML=h;
+  if(document.getElementById('f_ngay'))document.getElementById('f_ngay').valueAsDate=new Date();
+}
+
+/* ════════════════════════════════════════════
+   LỊCH SỬ
+════════════════════════════════════════════ */
+function renderHistory(){
+  const trips=TRIPS.filter(t=>t.ngayVe&&(user.role==='Tài xế'?t.maTX===user.ma:true));
+  let h=`<div class="card-biz" style="border-top:4px solid #64748b">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold m-0 text-secondary"><i class="bi bi-archive-fill me-2"></i>CHUYẾN ĐÃ HOÀN THÀNH</h5>
+      <span class="badge bg-secondary rounded-pill">${trips.length}</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-striped align-middle mb-0">
+        <thead><tr>
+          <th>Mã Chuyến</th><th>Ngày Đi</th><th>Ngày Về</th><th>Biển Số</th>
+          ${user.role!=='Tài xế'?'<th>Tài Xế</th>':''}
+          <th>Khách / DV</th><th class="text-end">DT Thực</th><th class="text-end">Lãi Gộp</th>
+        </tr></thead><tbody>`;
+  if(!trips.length){h+=`<tr><td colspan="8" class="text-center text-muted py-4">Chưa có lịch sử.</td></tr>`;}
+  else {
+    trips.forEach(t=>{
+      const lc=t.laiGop>0?'text-success':'text-danger';
+      h+=`<tr>
+        <td><span class="badge bg-secondary" style="font-size:10px">${t.id}</span></td>
+        <td>${t.ngayDi}</td><td class="text-muted">${t.ngayVe}</td>
+        <td class="fw-bold text-primary">${t.bienSo}</td>
+        ${user.role!=='Tài xế'?`<td>${t.tenTX}</td>`:''}
+        <td><small class="text-muted">${t.tenKH}</small><br><small>${t.dienGiai||''}</small></td>
+        <td class="text-end fw-bold">${fmtVND(t.dtThuc)}</td>
+        <td class="text-end fw-bold ${lc}">${fmtVND(t.laiGop)}</td>
+      </tr>`;
+    });
+  }
+  h+=`</tbody></table></div></div>`;
+  document.getElementById('content').innerHTML=h;
+}
+
+/* ════════════════════════════════════════════
+   BÁO CÁO LÃI LỖ
+════════════════════════════════════════════ */
+function renderReport(){
+  const now=new Date();
+  const def=String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear();
+  const fth=document.getElementById('rp_th')?.value||def;
+  const fxe=document.getElementById('rp_xe')?.value||'';
+
+  document.getElementById('content').innerHTML=`
+    <div class="card-biz" style="border-top:4px solid var(--blue)">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0 text-primary"><i class="bi bi-bar-chart-line-fill me-2"></i>BÁO CÁO LÃI LỖ TỪNG CHUYẾN</h5>
+      </div>
+      <div class="row g-2 mb-3">
+        <div class="col-md-3 col-6"><label class="form-label">Tháng/Năm</label><input type="text" id="rp_th" class="form-control" placeholder="MM/YYYY" value="${fth}" maxlength="7"></div>
+        <div class="col-md-3 col-6"><label class="form-label">Biển Số</label>
+          <select id="rp_xe" class="form-select"><option value="">-- Tất cả xe --</option>${VEHICLES.map(v=>`<option value="${v.ma}" ${fxe===v.ma?'selected':''}>${v.ma}</option>`).join('')}</select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end"><button onclick="renderReport()" class="btn btn-blue w-100">🔍 Lọc</button></div>
+      </div>
+      <div id="rp_body">
+        <div class="text-center py-4"><div class="spin mx-auto"></div><div class="mt-2 text-muted">Đang tính toán...</div></div>
+      </div>
+    </div>`;
+
+  setTimeout(()=>{
+    // Tính lãi lỗ từ mock data
+    let data=TRIPS.filter(t=>t.ngayVe&&t.ngayVe!=='HỦY');
+    if(fxe) data=data.filter(t=>t.bienSo===fxe);
+    if(fth){
+      data=data.filter(t=>{
+        if(!t.ngayDi)return false;
+        const p=t.ngayDi.split('/');
+        return (p[1]+'/'+p[2])===fth;
+      });
+    }
+
+    if(!data.length){
+      document.getElementById('rp_body').innerHTML=`<div class="text-center py-4 text-muted"><i class="bi bi-inbox fs-1 d-block mb-2"></i>Không có dữ liệu.</div>`;
+      return;
+    }
+
+    const tong=data.reduce((a,r)=>({dt:a.dt+r.dtThuc,cp:a.cp+r.tongCP,lg:a.lg+r.laiGop}),{dt:0,cp:0,lg:0});
+    const tyLe=tong.dt>0?(tong.lg/tong.dt*100).toFixed(1):0;
+    const lnColor=tong.lg>=0?'#065F46':'#991B1B';
+
+    const summary=`<div class="row g-3 mb-4">
+      <div class="col-6 col-md-3"><div class="stat-card" style="border-top:3px solid var(--blue)">
+        <div class="stat-lbl">Doanh Thu</div><div class="stat-val" style="font-size:17px;color:var(--blue)">${fmtVND(tong.dt)}</div>
+      </div></div>
+      <div class="col-6 col-md-3"><div class="stat-card" style="border-top:3px solid var(--amber)">
+        <div class="stat-lbl">Biến Phí</div><div class="stat-val" style="font-size:17px;color:var(--amber)">${fmtVND(tong.cp)}</div>
+      </div></div>
+      <div class="col-6 col-md-3"><div class="stat-card" style="border-top:3px solid ${lnColor}">
+        <div class="stat-lbl">Lãi Gộp</div><div class="stat-val" style="font-size:17px;color:${lnColor}">${fmtVND(tong.lg)}</div>
+        <div class="stat-sub">${tyLe}% tỷ suất</div>
+      </div></div>
+      <div class="col-6 col-md-3"><div class="stat-card" style="border-top:3px solid #6366F1">
+        <div class="stat-lbl">Số Chuyến</div><div class="stat-val" style="font-size:17px;color:#6366F1">${data.length}</div>
+      </div></div>
+    </div>`;
+
+    const rows=data.map(r=>{
+      const lc2=r.laiGop>=0?'text-success':'text-danger';
+      return `<tr>
+        <td><span class="badge bg-dark" style="font-size:10px">${r.id}</span><br><small class="text-muted">${r.ngayDi}</small></td>
+        <td class="fw-bold">${r.bienSo}</td>
+        <td>${r.tenTX}<br><small class="text-muted">${r.tenKH}</small></td>
+        <td><small>${r.dienGiai||'—'}</small></td>
+        <td class="text-end fw-bold text-primary">${fmtVND(r.dtThuc)}</td>
+        <td class="text-end text-muted">${fmtVND(r.tongCP)}</td>
+        <td class="text-end fw-bold ${lc2}">${fmtVND(r.laiGop)}</td>
+        <td class="text-end">${r.dtThuc>0?(r.laiGop/r.dtThuc*100).toFixed(1)+'%':'—'}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('rp_body').innerHTML=summary+`
+      <div class="table-responsive">
+        <table class="rpt-tbl">
+          <thead><tr>
+            <th>Mã / Ngày</th><th>Biển Số</th><th>Tài Xế / KH</th><th>Diễn Giải</th>
+            <th class="text-end">DT Thực</th><th class="text-end">Tổng CP</th>
+            <th class="text-end">Lãi Gộp</th><th class="text-end">Tỷ Lệ</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+          <tfoot><tr>
+            <td colspan="4">TỔNG (${data.length} chuyến)</td>
+            <td class="text-end text-primary">${fmtVND(tong.dt)}</td>
+            <td class="text-end text-warning">${fmtVND(tong.cp)}</td>
+            <td class="text-end fw-bold" style="color:${lnColor}">${fmtVND(tong.lg)}</td>
+            <td class="text-end" style="color:${lnColor}">${tyLe}%</td>
+          </tr></tfoot>
+        </table>
+      </div>
+      <div class="mt-3 p-3 rounded" style="background:#F8FAFC;font-size:11px;color:var(--muted)">
+        <b>Ghi chú:</b> Demo hiển thị lãi gộp = DT Thực − Chi phí trực tiếp. Trong hệ thống thật: định phí (khấu hao, BH/ĐK) được phân bổ theo ngày chuyến để ra lãi ròng chính xác.
+      </div>`;
+  },500);
+}
+
+/* ════════════════════════════════════════════
+   CÔNG NỢ
+════════════════════════════════════════════ */
+function renderDebt(){
+  const all=CONG_NO.filter(d=>d.conNo>0&&!d.ngayClear);
+  const tongCN=all.reduce((s,d)=>s+d.conNo,0);
+  let h=`<div class="card-biz" style="border-top:4px solid var(--purple)">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold m-0" style="color:var(--purple)"><i class="bi bi-clipboard-check me-2"></i>CÔNG NỢ PHẢI THU</h5>
+      <span class="pill pill-red">Tổng: ${fmtVND(tongCN)}</span>
+    </div>
+    <div class="table-responsive">
+      <table class="rpt-tbl">
+        <thead><tr>
+          <th>Mã CN</th><th>Mã Chuyến</th><th>Loại / Đối Tượng</th>
+          <th class="text-end">Phải Thu</th><th class="text-end">Đã Thu</th>
+          <th class="text-end">Còn Nợ</th><th>Hạn</th><th>Thao Tác</th>
+        </tr></thead><tbody>`;
+  if(!all.length){h+=`<tr><td colspan="8" class="text-center text-muted py-4"><i class="bi bi-check-circle me-2 text-success"></i>Không có công nợ!</td></tr>`;}
+  else {
+    all.forEach(d=>{
+      const rc=d.loaiNo==='Tài xế nợ quỹ'?'row-warn':'';
+      h+=`<tr class="${rc}">
+        <td><span class="badge bg-secondary" style="font-size:10px">${d.maCN}</span><br><small>${d.ngay}</small></td>
+        <td><span class="badge bg-dark" style="font-size:10px">${d.maChuyen}</span></td>
+        <td>${d.loaiNo==='Tài xế nợ quỹ'?'<span class="pill pill-amber">🚗 Tài xế</span>':'<span class="pill pill-blue">🏢 KH</span>'}
+          <br><small>${d.doiTuong}</small></td>
+        <td class="text-end fw-bold">${fmtVND(d.tongPT)}</td>
+        <td class="text-end text-success">${fmtVND(d.daThu)}</td>
+        <td class="text-end fw-bold text-danger">${fmtVND(d.conNo)}</td>
+        <td><small>${d.hanThu||'—'}</small></td>
+        <td>
+          <div class="d-flex gap-1">
+            <button onclick="showPayModal('${d.maCN}',${d.conNo},'${d.loaiNo}')" class="btn btn-purple btn-sm py-1 px-2" style="font-size:11px;min-height:32px"><i class="bi bi-cash me-1"></i>Thu</button>
+            ${['Admin','Giám đốc'].includes(user.role)?`<button onclick="confirmClear('${d.maCN}')" class="btn btn-red btn-sm py-1 px-2" style="font-size:11px;min-height:32px"><i class="bi bi-x-circle"></i></button>`:''}
+          </div>
+        </td>
+      </tr>`;
+    });
+  }
+  h+=`</tbody></table></div></div>`;
+  document.getElementById('content').innerHTML=h;
+}
+
+/* ════════════════════════════════════════════
+   ACTIONS — TẠO CHUYẾN
+════════════════════════════════════════════ */
+function autoFillHH(){
+  const sel=document.getElementById('f_kh');
+  if(!sel)return;
+  const opt=sel.options[sel.selectedIndex];
+  const hh=parseFloat(opt.dataset.hh||0)*100;
+  const el=document.getElementById('f_hh');
+  if(el)el.value=hh>0?hh.toFixed(2):'';
+  calcDT();
+}
+function calcDT(){
+  const gt=Number(document.getElementById('f_gia_tt')?.value||0);
+  const hh=Number(document.getElementById('f_hh')?.value||0)/100;
+  const dt=gt>0?Math.round(gt*(1-hh)):0;
+  const el=document.getElementById('f_dt');
+  if(el)el.textContent=dt>0?fmtVND(dt):'—';
+}
+
+async function submitTrip(){
+  const maTX=document.getElementById('f_tx').value;
+  const maKH=document.getElementById('f_kh').value;
+  if(!maTX)return Swal.fire('Thiếu tài xế','Vui lòng chọn tài xế.','warning');
+  if(!maKH)return Swal.fire('Thiếu khách hàng','Vui lòng chọn khách hàng.','warning');
+  const dien=document.getElementById('f_dien').value;
+  const giaTT=Number(document.getElementById('f_gia_tt').value||0);
+  const giaHD=Number(document.getElementById('f_gia_hd').value||0);
+  const pctHH=Number(document.getElementById('f_hh').value||0)/100;
+  const dtThuc=giaTT>0?Math.round(giaTT*(1-pctHH)):0;
+  const kmDau=Number(document.getElementById('f_km').value||0);
+  if(!kmDau)return Swal.fire('Thiếu KM','Vui lòng nhập số KM đồng hồ.','warning');
+  const gioh=document.getElementById('f_gio_h').value;
+  const giom=document.getElementById('f_gio_m').value;
+  const ngayDi=document.getElementById('f_ngay').value;
+  // Format ngày DD/MM/YYYY
+  const d=new Date(ngayDi);
+  const ngayStr=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  const tx=DRIVERS.find(x=>x.ma===maTX)||{ten:''};
+  const kh=CUSTOMERS.find(x=>x.ma===maKH)||{ten:''};
+  const cpDau=Number(document.getElementById('f_dau').value||0);
+  const cpAn=Number(document.getElementById('f_an').value||0);
+  const cpVe=Number(document.getElementById('f_ve').value||0);
+  const cpKD=Number(document.getElementById('f_kd').value||0);
+  const cpSua=Number(document.getElementById('f_sua').value||0);
+  const cpKhac=Number(document.getElementById('f_khac').value||0);
+  const tongCP=cpDau+cpAn+cpVe+cpKD+cpSua+cpKhac;
+
+  const ok=await Swal.fire({
+    title:'Xác nhận phát lệnh?',
+    html:`KH: <b>${kh.ten}</b><br>DV: <b>${dien}</b><br>Ngày: <b>${ngayStr}</b> — Giờ: <b class="text-danger">${gioh}:${giom}</b><br>Giá TT: <b>${fmtVND(giaTT)}</b> | DT Thực: <b class="text-success">${fmtVND(dtThuc)}</b>`,
+    icon:'question',showCancelButton:true,confirmButtonText:'✅ Phát Lệnh',cancelButtonText:'Hủy',confirmButtonColor:'#DC2626'
+  });
+  if(!ok.isConfirmed)return;
+
+  toggleLoader(true);
+  setTimeout(()=>{
+    toggleLoader(false);
+    const yr=String(d.getFullYear()).slice(2);
+    const mm=String(d.getMonth()+1).padStart(2,'0');
+    const dd2=String(d.getDate()).padStart(2,'0');
+    const newId=`CX${yr}${mm}${dd2}-${String(Math.floor(10+Math.random()*90))}`;
+    const newTrip={row:3+TRIPS.length,id:newId,ngayDi:ngayStr,ngayVe:'',bienSo:document.getElementById('f_xe').value,maTX,tenTX:tx.ten,dienGiai:dien,maKH,tenKH:kh.ten,giaTT,giaHD,pctHH,dtThuc,tongCP,laiGop:dtThuc-tongCP,kmDau,kmCuoi:'',gioCoMat:`${gioh}:${giom}`,diemTapKet:'Bãi xe công ty',trangThaiTBao:'Đang xử lý...'};
+    TRIPS.push(newTrip);
+    // Tạo công nợ
+    if(dtThuc>0){
+      const newCN={row:3+CONG_NO.length,maCN:`CN${String(CONG_NO.length+1).padStart(3,'0')}`,maChuyen:newId,ngay:ngayStr,loaiNo:'Khách hàng nợ',doiTuong:kh.ten,maDoiTuong:maKH,tongPT:dtThuc,daThu:0,conNo:dtThuc,hanThu:'',ngayClear:''};
+      CONG_NO.push(newCN);
+    }
+    appData.activeTrips=TRIPS.filter(t=>!t.ngayVe);
+    Swal.fire({icon:'success',title:'Tạo chuyến thành công!',html:`Mã: <b>${newId}</b><br>📧 Đang gửi thông báo Google Calendar + Gmail...`,timer:2500,showConfirmButton:false});
+    setTimeout(()=>{
+      TRIPS.find(t=>t.id===newId).trangThaiTBao='Đã gửi';
+      renderWork();
+    },2600);
+  },700);
+}
+
+/* ════════════════════════════════════════════
+   KHAI BÁO CHI PHÍ (danh mục động)
+════════════════════════════════════════════ */
+function openExpense(maChuyen){
+  const dmCP=appData.danhMucChiPhi||[];
+  if(!dmCP.length)return Swal.fire('Chưa có danh mục','Kiểm tra sheet DM_KhoanChi.','warning');
+  const rows=dmCP.map((item,idx)=>`
+    <tr>
+      <td style="padding:7px 4px;white-space:nowrap">
+        <span style="font-size:10px;background:#E2E8F0;padding:2px 6px;border-radius:4px;margin-right:6px;font-weight:700">${item.ma}</span>
+        <span style="font-weight:600;font-size:13px">${item.ten}</span>
+      </td>
+      <td style="padding:7px 4px">
+        <input type="number" id="cp_amt_${idx}" min="0" step="1000" class="form-control form-control-sm text-end" placeholder="0" style="min-width:110px" oninput="_updTotal()">
+      </td>
+      <td style="padding:7px 4px">
+        <input type="text" id="cp_note_${idx}" class="form-control form-control-sm" placeholder="Ghi chú..." style="min-width:90px">
+      </td>
+    </tr>`).join('');
+
+  Swal.fire({
+    title:'📋 KHAI BÁO CHI PHÍ',
+    html:`<div style="text-align:left">
+      <div style="font-size:11px;color:#64748B;margin-bottom:10px">Chuyến <b>${maChuyen}</b> — Điền số tiền vào các khoản phát sinh.</div>
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="background:#F8FAFC">
+          <th style="padding:8px 4px;text-align:left;font-size:10px;text-transform:uppercase;color:#475569">Khoản Chi</th>
+          <th style="padding:8px 4px;text-align:center;font-size:10px;text-transform:uppercase;color:#475569;min-width:120px">Số Tiền (₫)</th>
+          <th style="padding:8px 4px;text-align:left;font-size:10px;text-transform:uppercase;color:#475569;min-width:100px">Ghi Chú</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr style="background:#FEF3C7;border-top:2px solid #FCD34D">
+          <td style="padding:8px 4px;font-weight:700;color:#92400E">TỔNG CHI PHÍ</td>
+          <td style="padding:8px 4px;text-align:right;font-weight:700;color:#DC2626;font-size:15px" id="cp_total">0 ₫</td><td></td>
+        </tr></tfoot>
+      </table></div></div>`,
+    width:'540px',showCancelButton:true,confirmButtonText:'📤 Gửi báo cáo',cancelButtonText:'Hủy',confirmButtonColor:'#D97706',
+    didOpen:()=>document.getElementById('cp_amt_0')?.focus(),
+    preConfirm:()=>{
+      const expenses=[];
+      dmCP.forEach((item,idx)=>{
+        const amt=Number(document.getElementById(`cp_amt_${idx}`)?.value||0);
+        if(amt>0)expenses.push({ma:item.ma,ten:item.ten,tien:amt,ghiChu:document.getElementById(`cp_note_${idx}`)?.value||''});
+      });
+      if(!expenses.length){Swal.showValidationMessage('Nhập ít nhất 1 khoản chi!');return false;}
+      return expenses;
+    }
+  }).then(async r=>{
+    if(!r.isConfirmed||!r.value)return;
+    const exps=r.value;
+    const tong=exps.reduce((s,e)=>s+e.tien,0);
+    const ok=await Swal.fire({
+      title:'Xác nhận gửi?',
+      html:exps.map(e=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #F1F5F9"><span>${e.ten}</span><b>${fmtVND(e.tien)}</b></div>`).join('')+
+        `<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:15px;font-weight:700;color:#DC2626"><span>TỔNG</span><span>${fmtVND(tong)}</span></div>`,
+      icon:'question',showCancelButton:true,confirmButtonText:'✅ Xác nhận',cancelButtonText:'Sửa lại',confirmButtonColor:'#D97706'
+    });
+    if(ok.isConfirmed){
+      toggleLoader(true);
+      setTimeout(()=>{toggleLoader(false);Swal.fire({icon:'success',title:'Đã ghi nhận!',html:`${exps.length} khoản chi | Tổng: <b>${fmtVND(tong)}</b>`,timer:2000,showConfirmButton:false});},500);
+    }
+  });
+}
+function _updTotal(){
+  const dmCP=appData.danhMucChiPhi||[];
+  let t=0;
+  dmCP.forEach((_,i)=>{t+=Number(document.getElementById(`cp_amt_${i}`)?.value||0);});
+  const el=document.getElementById('cp_total');
+  if(el){el.textContent=fmtVND(t);el.style.color=t>0?'#DC2626':'#64748B';}
+}
+
+/* ════════════════════════════════════════════
+   ACTIONS — KẾT THÚC CHUYẾN
+════════════════════════════════════════════ */
+async function finishTrip(maChuyen,row){
+  const{value:km}=await Swal.fire({
+    title:'🏁 KẾT THÚC CHUYẾN',
+    html:`<p>Chuyến: <b>${maChuyen}</b></p><label class="form-label">Số KM đồng hồ lúc về bãi</label><input id="km-val" type="number" class="form-control" placeholder="VD: 125.500">`,
+    showCancelButton:true,confirmButtonText:'✅ Chốt Chuyến',cancelButtonText:'Chưa về',confirmButtonColor:'#059669',
+    preConfirm:()=>{const v=document.getElementById('km-val').value;if(!v){Swal.showValidationMessage('Nhập số KM!');return false;}return v;}
+  });
+  if(!km)return;
+  toggleLoader(true);
+  setTimeout(()=>{
+    toggleLoader(false);
+    const t=TRIPS.find(x=>x.id===maChuyen);
+    if(t){const now=new Date();t.ngayVe=`${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;t.kmCuoi=Number(km);}
+    appData.activeTrips=TRIPS.filter(t=>!t.ngayVe);
+    appData.myDebts=CONG_NO.filter(d=>d.loaiNo==='Tài xế nợ quỹ'&&d.maDoiTuong===user.ma&&d.conNo>0);
+    Swal.fire({icon:'success',title:'🏁 Chuyến đã kết thúc!',text:'Cảm ơn bạn!',timer:2000,showConfirmButton:false}).then(renderWork);
+  },600);
+}
+
+/* ════════════════════════════════════════════
+   ACTIONS — HỦY CHUYẾN
+════════════════════════════════════════════ */
+async function doCancel(row,id){
+  const{value:lyDo}=await Swal.fire({title:`🚫 Hủy chuyến ${id}?`,input:'text',inputPlaceholder:'Lý do hủy...',showCancelButton:true,confirmButtonText:'Xác nhận hủy',cancelButtonText:'Giữ lại',confirmButtonColor:'#DC2626',inputValidator:v=>{if(!v)return'Nhập lý do!'}});
+  if(!lyDo)return;
+  toggleLoader(true);
+  setTimeout(()=>{
+    toggleLoader(false);
+    const t=TRIPS.find(x=>x.id===id);
+    if(t)t.ngayVe='HỦY';
+    appData.activeTrips=TRIPS.filter(t=>!t.ngayVe);
+    Swal.fire({icon:'success',title:'Đã hủy chuyến!',text:id,timer:1800,showConfirmButton:false}).then(renderWork);
+  },500);
+}
+
+/* ════════════════════════════════════════════
+   ACTIONS — XUẤT HÓA ĐƠN
+════════════════════════════════════════════ */
+async function doExportInvoice(row,id){
+  const t=TRIPS.find(x=>x.id===id);
+  if(!t)return;
+  const ok=await Swal.fire({title:`🧾 Xuất HĐ — ${id}`,html:`<div style="text-align:left">
+    <table style="width:100%;font-size:13px;border-collapse:collapse">
+      <tr><td style="padding:5px;color:#64748B">Biển số xe:</td><td style="padding:5px;font-weight:700">${t.bienSo}</td></tr>
+      <tr style="background:#F8FAFC"><td style="padding:5px;color:#64748B">Khách hàng:</td><td style="padding:5px;font-weight:700">${t.tenKH}</td></tr>
+      <tr><td style="padding:5px;color:#64748B">Dịch vụ:</td><td style="padding:5px">${t.dienGiai||'Vận chuyển hàng hóa'}</td></tr>
+      <tr style="background:#F8FAFC"><td style="padding:5px;color:#64748B">Giá xuất HĐ:</td><td style="padding:5px;font-weight:700;color:#1D4ED8">${fmtVND(t.giaHD||t.giaTT)}</td></tr>
+    </table>
+    <div style="margin-top:10px;padding:8px;background:#F0FDF4;border-radius:6px;font-size:12px;color:#065F46">✅ Hệ thống sẽ thêm 1 dòng vào sheet <b>HOA_DON_XUAT</b> trong Google Sheet thật.</div>
+  </div>`,icon:'question',showCancelButton:true,confirmButtonText:'✅ Xuất HĐ',cancelButtonText:'Hủy',confirmButtonColor:'#059669'});
+  if(!ok.isConfirmed)return;
+  toggleLoader(true);
+  setTimeout(()=>{
+    toggleLoader(false);
+    const now=new Date();
+    const soHD=`HD/${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/001`;
+    Swal.fire({icon:'success',title:'Đã xuất hóa đơn!',html:`Số HĐ: <b>${soHD}</b><br>Xe: <b>${t.bienSo}</b><br>Tổng: <b>${fmtVND(t.giaHD||t.giaTT)}</b>`,timer:3000,showConfirmButton:false});
+  },600);
+}
+
+/* ════════════════════════════════════════════
+   ACTIONS — BÁO THU TIỀN MẶT (TÀI XẾ)
+════════════════════════════════════════════ */
+async function openCashModal(id,ten){
+  const{value:fv}=await Swal.fire({
+    title:'💵 BÁO THU TIỀN MẶT',
+    html:`<div style="text-align:left"><p style="color:#64748B;font-size:13px">Chuyến <b>${id}</b> — <b>${ten}</b></p>
+      <label class="form-label">Số tiền đã thu từ khách (₫)</label>
+      <input id="cash-amt" type="number" class="form-control mb-2" min="0" step="1000" oninput="const el=document.getElementById('cash-prev');if(el)el.textContent=this.value>0?'→ '+fmtVND(this.value):''">
+      <div id="cash-prev" style="font-size:13px;color:#1D4ED8;font-weight:700;margin-bottom:8px"></div>
+      <label class="form-label">Ghi chú</label>
+      <input id="cash-note" type="text" class="form-control" placeholder="Tên khách, số HĐ..."></div>`,
+    showCancelButton:true,confirmButtonText:'✅ Xác nhận',cancelButtonText:'Hủy',confirmButtonColor:'#1D4ED8',
+    preConfirm:()=>{const a=document.getElementById('cash-amt').value;if(!a||a<=0){Swal.showValidationMessage('Nhập số tiền!');return false;}return{soTien:a,ghiChu:document.getElementById('cash-note').value};}
+  });
+  if(!fv)return;
+  toggleLoader(true);
+  setTimeout(()=>{
+    toggleLoader(false);
+    // Tạo công nợ tài xế nợ quỹ
+    const newCN={row:3+CONG_NO.length,maCN:`TX${user.ma}B`,maChuyen:id,ngay:new Date().toLocaleDateString('vi-VN'),loaiNo:'Tài xế nợ quỹ',doiTuong:user.ten,maDoiTuong:user.ma,tongPT:Number(fv.soTien),daThu:0,conNo:Number(fv.soTien),hanThu:'',ngayClear:''};
+    CONG_NO.push(newCN);
+    appData.myDebts=CONG_NO.filter(d=>d.loaiNo==='Tài xế nợ quỹ'&&d.maDoiTuong===user.ma&&d.conNo>0);
+    Swal.fire({icon:'success',title:'Đã ghi nhận!',html:`Nợ quỹ: <b>${fmtVND(fv.soTien)}</b>`,timer:2000,showConfirmButton:false}).then(renderWork);
+  },500);
+}
+
+/* ════════════════════════════════════════════
+   ACTIONS — NỘP TIỀN VỀ QUỸ
+════════════════════════════════════════════ */
+async function openPayFund(maCN,conNo){
+  const{value:fv}=await Swal.fire({
+    title:'🏦 NỘP TIỀN VỀ QUỸ',
+    html:`<div style="text-align:left"><p>Mã CN: <b>${maCN}</b> — Còn: <b class="text-danger">${fmtVND(conNo)}</b></p>
+      <label class="form-label">Số tiền nộp (₫)</label>
+      <input id="fund-amt" type="number" class="form-control mb-2" value="${conNo}" min="1" step="1000" max="${conNo}" oninput="const el=document.getElementById('fund-prev');if(el)el.textContent=this.value>0?'→ Nộp '+fmtVND(this.value):''">
+      <div id="fund-prev" style="font-size:13px;color:#059669;font-weight:700;margin-bottom:8px"></div>
+      <label class="form-label">Ghi chú</label>
+      <input id="fund-note" type="text" class="form-control" placeholder="Ghi chú..."></div>`,
+    showCancelButton:true,confirmButtonText:'✅ Xác nhận',cancelButtonText:'Chưa nộp',confirmButtonColor:'#059669',
+    preConfirm:()=>{const a=document.getElementById('fund-amt').value;if(!a||a<=0){Swal.showValidationMessage('Nhập số tiền!');return false;}return{soTien:a};}
+  });
+  if(!fv)return;
+  toggleLoader(true);
+  setTimeout(()=>{
+    toggleLoader(false);
+    const cn=CONG_NO.find(x=>x.maCN===maCN);
+    if(cn){cn.daThu+=Number(fv.soTien);cn.conNo=Math.max(0,cn.tongPT-cn.daThu);if(cn.conNo<=0)cn.ngayClear=new Date().toLocaleDateString('vi-VN');}
+    appData.myDebts=CONG_NO.filter(d=>d.loaiNo==='Tài xế nợ quỹ'&&d.maDoiTuong===user.ma&&d.conNo>0);
+    Swal.fire({icon:'success',title:'Đã nộp quỹ!',html:`Nộp: <b>${fmtVND(fv.soTien)}</b> | Còn: <b>${fmtVND(Math.max(0,conNo-fv.soTien))}</b>`,timer:2000,showConfirmButton:false}).then(renderWork);
+  },500);
+}
+
+/* ════════════════════════════════════════════
+   ACTIONS — THU TIỀN KH (QUẢN LÝ)
+════════════════════════════════════════════ */
+async function submitPayment(){
+  const maCN=document.getElementById('pay_cn').value.trim();
+  const st=document.getElementById('pay_st').value;
+  if(!maCN)return Swal.fire('Thiếu','Nhập Mã Công Nợ.','warning');
+  if(!st||st<=0)return Swal.fire('Thiếu','Nhập số tiền.','warning');
+  const ok=await Swal.fire({title:'Xác nhận thu?',html:`Mã CN: <b>${maCN}</b><br>Số tiền: <b class="text-success">${fmtVND(st)}</b>`,icon:'question',showCancelButton:true,confirmButtonText:'✅ Xác nhận',confirmButtonColor:'#7C3AED'});
+  if(!ok.isConfirmed)return;
+  toggleLoader(true);
+  setTimeout(()=>{
+    toggleLoader(false);
+    const cn=CONG_NO.find(x=>x.maCN===maCN);
+    if(!cn)return Swal.fire('Lỗi','Không tìm thấy mã công nợ: '+maCN,'error');
+    cn.daThu+=Number(st);cn.conNo=Math.max(0,cn.tongPT-cn.daThu);
+    if(cn.conNo<=0)cn.ngayClear=new Date().toLocaleDateString('vi-VN');
+    Swal.fire({icon:'success',title:'Ghi nhận thành công!',html:`Thu: <b>${fmtVND(st)}</b> | Còn: <b>${fmtVND(cn.conNo)}</b>`,timer:2000,showConfirmButton:false}).then(renderDebt);
+  },500);
+}
+
+async function showPayModal(maCN,conNo,loaiNo){
+  const ht=loaiNo==='Tài xế nợ quỹ'?'TM - Tài xế nộp quỹ':'CK - Khách hàng';
+  const{value:fv}=await Swal.fire({
+    title:'💰 GHI NHẬN THU',
+    html:`<div style="text-align:left"><p>Mã CN: <b>${maCN}</b> — Còn: <b class="text-danger">${fmtVND(conNo)}</b></p>
+      <label class="form-label">Số tiền thu</label>
+      <input id="sp-amt" type="number" class="form-control mb-2" value="${conNo}" min="1" step="1000" oninput="const el=document.getElementById('sp-prev');if(el)el.textContent=this.value>0?'→ '+fmtVND(this.value):''">
+      <div id="sp-prev" style="font-size:13px;color:#7C3AED;font-weight:700;margin-bottom:8px"></div>
+      <label class="form-label">Hình thức</label>
+      <select id="sp-ht" class="form-select mb-2">
+        <option value="CK - Khách hàng" ${ht==='CK - Khách hàng'?'selected':''}>CK - Khách hàng</option>
+        <option value="TM - Tài xế nộp quỹ" ${ht==='TM - Tài xế nộp quỹ'?'selected':''}>TM - Tài xế nộp quỹ</option>
+        <option value="CK - Tài xế nộp">CK - Tài xế nộp</option>
+      </select>
+      <label class="form-label">Nội dung</label>
+      <input id="sp-nd" type="text" class="form-control" placeholder="Nội dung CK..."></div>`,
+    showCancelButton:true,confirmButtonText:'✅ Ghi nhận',cancelButtonText:'Hủy',confirmButtonColor:'#7C3AED',
+    preConfirm:()=>{const a=document.getElementById('sp-amt').value;if(!a||a<=0){Swal.showValidationMessage('Nhập số tiền!');return false;}return{soTien:a};}
+  });
+  if(!fv)return;
+  toggleLoader(true);
+  setTimeout(()=>{
+    toggleLoader(false);
+    const cn=CONG_NO.find(x=>x.maCN===maCN);
+    if(cn){cn.daThu+=Number(fv.soTien);cn.conNo=Math.max(0,cn.tongPT-cn.daThu);if(cn.conNo<=0)cn.ngayClear=new Date().toLocaleDateString('vi-VN');}
+    Swal.fire({icon:'success',title:'Ghi nhận thành công!',html:`Thu: <b>${fmtVND(fv.soTien)}</b>`,timer:2000,showConfirmButton:false}).then(renderDebt);
+  },500);
+}
+
+async function confirmClear(maCN){
+  const{value:lyDo}=await Swal.fire({title:`🚫 Xóa nợ ${maCN}?`,input:'text',inputPlaceholder:'Lý do (bắt buộc)...',showCancelButton:true,confirmButtonText:'Xác nhận',confirmButtonColor:'#DC2626',inputValidator:v=>{if(!v)return'Nhập lý do!'}});
+  if(!lyDo)return;
+  const cn=CONG_NO.find(x=>x.maCN===maCN);
+  if(cn)cn.ngayClear=new Date().toLocaleDateString('vi-VN');
+  Swal.fire({icon:'success',title:'Đã xóa nợ!',text:maCN,timer:1500,showConfirmButton:false}).then(renderDebt);
+}
+
+/* ════════════════════════════════════════════
+   MISC
+════════════════════════════════════════════ */
+function forgotPassword(){Swal.fire('Demo','Mật khẩu = Role@2026\nAdmin@2026 | DX@2026 | TX@2026 | KT@2026','info')}
+</script>
+</body>
+</html>
